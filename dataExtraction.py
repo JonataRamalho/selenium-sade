@@ -20,6 +20,24 @@ element = driver.find_element(By.XPATH, '//ul[@id="ad-list"]')
 
 ads = element.find_elements(By.XPATH, '//ul[@id="ad-list"]/li')
 
+# TODO: Fazendo
+months = [{
+    "month": 'Jan',
+    "number": 1
+},
+    {
+    "month": 'Fev',
+    "number": 2
+},
+    {
+    "month": 'Mar',
+    "number": 3
+},
+    {
+    "month": 'Abr',
+    "number": 1
+}]
+
 dataAds = []
 
 for i in range(len(ads)):
@@ -39,6 +57,13 @@ for i in range(len(ads)):
         price = element.find_element(
             By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[2]/span')
 
-        print(price.text)
+        publication = element.find_element(
+            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[2]/div[1]/div[2]/span[3]').text.split(',')
+
+        day = publication[0]
+
+        hour = publication[1]
+
+        print(hour)
     except:
         pass
