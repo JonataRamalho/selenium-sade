@@ -7,6 +7,7 @@ import time
 import pandas as pd
 from datetime import date, datetime
 from dateutil import parser
+import re
 
 
 service = Service(executable_path=ChromeDriverManager().install(), port=12345)
@@ -55,32 +56,49 @@ def getDate(day):
         data = datetime(year, month, int(abbreviatedDay))
         return data.strftime('%d/%m/%Y')
 
+def getCarBrandAndModel(description):
+    # Remove digits, special characters, and extra spaces
+    brand_model = re.sub(r'[\d.,/()-]', '', description).strip()
+    # Remove multiple spaces
+    brand_model = re.sub(r'\s{2,}', ' ', brand_model)
+    # Split the string by space and take the first two words
+    brand_model = brand_model.split()[:2]
+    
+    return brand_model
 
 for i in range(len(ads)):
     try:
+        # dscAnuncio
         description = element.find_element(
-            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/h2')
-
+            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/h2').text
+        brand, model = getCarBrandAndModel(description)
+        #qtdKm
         amountKm = element.find_element(
             By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[1]/span')
-
+        #tipCambio
         gearshiftType = element.find_element(
             By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[4]/span')
-
+        #tipCombustivel
         fuelType = element.find_element(
             By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[3]/span')
-
+        #valPreco
         price = element.find_element(
             By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[2]/span')
 
         day, hour = element.find_element(
             By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[2]/div[1]/div[2]/span[3]').text.split(',')
+        #diaAnuncio
+        adDate = getDate(day.lower())
+        #horAnuncio
+        adTime = hour
+        #dscLocal
+        local  = element.find_element(
+            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[2]/div[1]/div[2]/span[1]').text.split(',')
+        # dscMarca
+        carBrand = brand
+        # dscModelo
+        carModel = model
 
-        announcementDate = getDate(day.lower())
-
-        print(announcementDate)
-
-        # TODO: Falta obter indo de local
         # TODO: Falta fazer a paginação
         # TODO: Enviar os dados para tbl_temp_veiculo
 
