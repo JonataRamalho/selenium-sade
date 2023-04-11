@@ -22,6 +22,11 @@ time.sleep(10)
 
 element = driver.find_element(By.XPATH, '//ul[@id="ad-list"]')
 
+pagination_element = driver.find_element(By.XPATH, '//*[@id="listing-main-content-slot"]/div[13]/div/div/div[2]/div/div[2]/a')
+_, total_pages = pagination_element.get_attribute("href").split('o=')
+
+print(f'Total pages: {total_pages}')
+
 ads = element.find_elements(By.XPATH, '//ul[@id="ad-list"]/li')
 
 months = {
