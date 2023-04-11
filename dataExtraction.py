@@ -8,6 +8,7 @@ import pandas as pd
 from datetime import date, datetime
 from dateutil import parser
 import re
+from createSqliteDatabase import insert_data_into_temp_veiculo
 
 
 service = Service(executable_path=ChromeDriverManager().install(), port=12345)
@@ -99,8 +100,10 @@ for i in range(len(ads)):
         # dscModelo
         carModel = model
 
+        dataAds.append((description, amountKm.text, gearshiftType.text, fuelType.text, price.text, adDate, adTime, ','.join(local), carBrand, carModel))
         # TODO: Falta fazer a paginação
-        # TODO: Enviar os dados para tbl_temp_veiculo
 
     except:
         pass
+
+insert_data_into_temp_veiculo(dataAds)
