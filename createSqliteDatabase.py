@@ -61,3 +61,17 @@ conn.execute("""
 """)
 
 conn.close()
+
+def insert_data_into_temp_veiculo(data):
+    conn = sqlite3.connect("anuncios.db")
+    cursor = conn.cursor()
+    
+    insert_query = """
+    INSERT INTO tbl_temp_veiculo (
+        dscAnuncio, qtdKm, tipCambio, tipCombustivel, valPreco, diaAnuncio, horAnuncio, dscLocal, dscMarca, dscModelo
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
+
+    cursor.executemany(insert_query, data)
+    conn.commit()
+    conn.close()
