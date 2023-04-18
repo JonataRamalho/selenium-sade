@@ -6,9 +6,10 @@ conn = sqlite3.connect("anuncios.db")
 conn.execute("""
     CREATE TABLE IF NOT EXISTS dimtempo (
         idTempo INTEGER PRIMARY KEY AUTOINCREMENT,
-        AnoTempo int(4) DEFAULT NULL
+        AnoTempo int(4) UNIQUE DEFAULT NULL
     )
 """)
+
 
 conn.execute("""
     CREATE TABLE IF NOT EXISTS dimlocal (
@@ -62,10 +63,11 @@ conn.execute("""
 
 conn.close()
 
+
 def insert_data_into_temp_veiculo(data):
     conn = sqlite3.connect("anuncios.db")
     cursor = conn.cursor()
-    
+
     insert_query = """
     INSERT INTO tbl_temp_veiculo (
         dscAnuncio, qtdKm, tipCambio, tipCombustivel, valPreco, diaAnuncio, horAnuncio, dscLocal, dscMarca, dscModelo

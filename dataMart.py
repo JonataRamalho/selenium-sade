@@ -17,7 +17,7 @@ def insert_into_dimensions_and_fact_table():
     df_temp = df_temp.drop_duplicates()
 
     # Substituir células vazias por "não informado"
-    df_temp = df_temp.fillna("não informado")
+    df_temp = df_temp.applymap(lambda x: "não informado" if x == "" else x)
 
     # Iterar sobre as linhas do DataFrame
     for index, row in df_temp.iterrows():
