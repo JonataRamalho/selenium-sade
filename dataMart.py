@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 from unidecode import unidecode
+import re
 
 def insert_into_dimensions_and_fact_table():
     conn = sqlite3.connect("anuncios.db")
@@ -45,16 +46,20 @@ def insert_into_dimensions_and_fact_table():
         idLocal_result = cursor.fetchone()
         idLocal = idLocal_result[0] if idLocal_result else None
 
+        # Extrair o ano do dscAnuncio usando uma expressão regular
+        ano_match = re.search(r'\b\d{4}\b', dscAnuncio)
+        AnoVeiculo = ano_match.group() if ano_match else "não informado"
+
         # Inserir dados na dimensão dimveiculo
         cursor.execute("""
             INSERT OR IGNORE INTO dimveiculo (
                 NomVeiculo, NomMarca, AnoVeiculo, QtdKm, TipCambio, TipCombustivel, ValPreco, dscAnuncio
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (dscModelo, dscMarca, diaAnuncio[:4], qtdKm, tipCambio, tipCombustivel, valPreco, dscAnuncio))
+        """, (dscModelo, dscMarca, AnoVeiculo, qtdKm, tipCambio, tipCombustivel, valPreco, dscAnuncio))
         cursor.execute("""
             SELECT idVeiculo FROM dimveiculo
             WHERE NomVeiculo = ? AND NomMarca = ? AND AnoVeiculo = ? AND QtdKm = ? AND TipCambio = ? AND TipCombustivel = ? AND ValPreco = ? AND dscAnuncio = ?
-        """, (dscModelo, dscMarca, diaAnuncio[:4], qtdKm, tipCambio, tipCombustivel, valPreco, dscAnuncio))
+        """, (dscModelo, dscMarca, AnoVeiculo, qtdKm, tipCambio, tipCombustivel, valPreco, dscAnuncio))
         idVeiculo_result = cursor.fetchone()
         idVeiculo = idVeiculo_result[0] if idVeiculo_result else None
 
