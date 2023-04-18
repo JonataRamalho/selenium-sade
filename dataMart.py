@@ -1,6 +1,6 @@
 import sqlite3
 import pandas as pd
-
+from unidecode import unidecode
 
 def insert_into_dimensions_and_fact_table():
     conn = sqlite3.connect("anuncios.db")
@@ -33,9 +33,11 @@ def insert_into_dimensions_and_fact_table():
             "SELECT idTempo FROM dimtempo WHERE AnoTempo = ?", (anoTempo,))
         idTempo = cursor.fetchone()[0]
 
-        # Inserir dados na dimensão dimlocal
+         # Inserir dados na dimensão dimlocal
         nomMunicipio, *nomBairro = dscLocal.split(', ', maxsplit=1)
         nomBairro = nomBairro[0] if nomBairro else None
+        if nomBairro:
+            nomBairro = unidecode(nomBairro.lower())
         cursor.execute(
             "INSERT OR IGNORE INTO dimlocal (nomMunicipio, nomBairro) VALUES (?, ?)", (nomMunicipio, nomBairro))
         cursor.execute(

@@ -15,9 +15,10 @@ conn.execute("""
     CREATE TABLE IF NOT EXISTS dimlocal (
         idLocal INTEGER PRIMARY KEY AUTOINCREMENT,
         nomMunicipio varchar(45) DEFAULT NULL,
-        nomBairro varchar(45) DEFAULT NULL
+        nomBairro varchar(45) UNIQUE DEFAULT NULL
     )
 """)
+
 
 conn.execute("""
     CREATE TABLE IF NOT EXISTS dimveiculo (
