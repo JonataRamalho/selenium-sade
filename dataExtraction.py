@@ -9,7 +9,9 @@ from datetime import date, datetime
 from dateutil import parser
 import re
 from createSqliteDatabase import insert_data_into_temp_veiculo
+import spacy
 
+nlp = spacy.load("pt_core_news_sm")
 
 service = Service(executable_path=ChromeDriverManager().install(), port=12345)
 
@@ -62,22 +64,36 @@ def getDate(day):
         data = datetime(year, month, int(abbreviatedDay))
         return data.strftime('%d/%m/%Y')
 
-def getCarBrandAndModel(description):
-    # Remove digits, special characters, and extra spaces
-    brand_model = re.sub(r'[\d.,/()-]', '', description).strip()
-    # Remove multiple spaces
-    brand_model = re.sub(r'\s{2,}', ' ', brand_model)
-    # Split the string by space and take the first two words
-    brand_model = brand_model.split()[:2]
+# def getCarBrandAndModel(description):
+#     # Remove digits, special characters, and extra spaces
+#     brand_model = re.sub(r'[\d.,/()-]', '', description).strip()
+#     # Remove multiple spaces
+#     brand_model = re.sub(r'\s{2,}', ' ', brand_model)
+#     # Split the string by space and take the first two words
+#     brand_model = brand_model.split()[:2]
     
-    return brand_model
+def get_brand_and_model(dscAnuncio):
+    doc = nlp(dscAnuncio)
+
+    brand, model = "não informado", "não informado"
+
+    for token in doc:
+        if token.pos_ == "PROPN":
+            if brand == "não informado":
+                brand = token.text
+            elif model == "não informado":
+                model = token.text
+            else:
+                break
+
+    return brand, model
 
 for i in range(len(ads)):
     try:
         # dscAnuncio
         description = element.find_element(
             By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/h2').text
-        brand, model = getCarBrandAndModel(description)
+        brand, model = get_brand_and_model(description)
         #qtdKm
         amountKm = element.find_element(
             By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[1]/span')
