@@ -15,7 +15,7 @@ nlp = spacy.load("pt_core_news_sm")
 
 service = Service(executable_path=ChromeDriverManager().install(), port=12345)
 
-url = 'https://www.olx.com.br/autos-e-pecas/carros-vans-e-utilitarios/estado-al?o=21'
+url = 'https://www.olx.com.br/autos-e-pecas/carros-vans-e-utilitarios/estado-al?o=1'
 
 driver = webdriver.Chrome(service=service)
 driver.get(url)
@@ -27,9 +27,9 @@ element = driver.find_element(By.XPATH, '//ul[@id="ad-list"]')
 pagination_element = driver.find_element(By.XPATH, '//*[@id="listing-main-content-slot"]/div[13]/div/div/div[2]/div/div[2]/a')
 _, total_pages = pagination_element.get_attribute("href").split('o=')
 
-print(f'Total pages: {total_pages}')
+total_pages = int(total_pages)
 
-ads = element.find_elements(By.XPATH, '//ul[@id="ad-list"]/li')
+# ads = element.find_elements(By.XPATH, '//ul[@id="ad-list"]/li')
 
 months = {
     'jan': 1,
@@ -88,43 +88,53 @@ def get_brand_and_model(dscAnuncio):
 
     return brand, model
 
-for i in range(len(ads)):
-    try:
-        # dscAnuncio
-        description = element.find_element(
-            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/h2').text
-        brand, model = get_brand_and_model(description)
-        #qtdKm
-        amountKm = element.find_element(
-            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[1]/span')
-        #tipCambio
-        gearshiftType = element.find_element(
-            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[4]/span')
-        #tipCombustivel
-        fuelType = element.find_element(
-            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[3]/span')
-        #valPreco
-        price = element.find_element(
-            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[2]/span')
+for page in range(1, total_pages + 1):
+    url = f'https://www.olx.com.br/autos-e-pecas/carros-vans-e-utilitarios/estado-al?o={2}'
+    driver.get(url)
 
-        day, hour = element.find_element(
-            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[2]/div[1]/div[2]/span[3]').text.split(',')
-        #diaAnuncio
-        adDate = getDate(day.lower())
-        #horAnuncio
-        adTime = hour
-        #dscLocal
-        local  = element.find_element(
-            By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[2]/div[1]/div[2]/span[1]').text.split(',')
-        # dscMarca
-        carBrand = brand
-        # dscModelo
-        carModel = model
+    time.sleep(10)
 
-        dataAds.append((description, amountKm.text, gearshiftType.text, fuelType.text, price.text, adDate, adTime, ','.join(local), carBrand, carModel))
-        # TODO: Falta fazer a paginação
+    element = driver.find_element(By.XPATH, '//ul[@id="ad-list"]')
 
-    except:
-        pass
+    ads = element.find_elements(By.XPATH, '//ul[@id="ad-list"]/li')
+
+    for i in range(len(ads)):
+        try:
+            # dscAnuncio
+            description = element.find_element(
+                By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/h2').text
+            
+            brand, model = get_brand_and_model(description)
+            #qtdKm
+            amountKm = element.find_element(
+                By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[1]/span')
+            #tipCambio
+            gearshiftType = element.find_element(
+                By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[4]/span')
+            #tipCombustivel
+            fuelType = element.find_element(
+                By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[1]/ul/li[3]/span')
+            #valPreco
+            price = element.find_element(
+                By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[1]/div[2]/span')
+
+            day, hour = element.find_element(
+                By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[2]/div[1]/div[2]/span[3]').text.split(',')
+            #diaAnuncio
+            adDate = getDate(day.lower())
+            #horAnuncio
+            adTime = hour
+            #dscLocal
+            local  = element.find_element(
+                By.XPATH, '//ul[@id="ad-list"]/li['+str(i+1)+']/a/div[2]/div[2]/div[1]/div[2]/span[1]').text.split(',')
+            # dscMarca
+            carBrand = brand
+            # dscModelo
+            carModel = model
+
+            dataAds.append((description, amountKm.text, gearshiftType.text, fuelType.text, price.text, adDate, adTime, ','.join(local), carBrand, carModel))
+
+        except:
+            pass
 
 insert_data_into_temp_veiculo(dataAds)
