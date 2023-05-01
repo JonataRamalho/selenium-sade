@@ -1,7 +1,7 @@
 import sqlite3
 import pandas as pd
 
-conn = sqlite3.connect("anuncios.db")
+conn = sqlite3.connect("anunciosComEtl.db")
 
 conn.execute("""
     CREATE TABLE IF NOT EXISTS dimtempo (
@@ -26,10 +26,10 @@ conn.execute("""
         NomVeiculo varchar(30) DEFAULT NULL,
         NomMarca varchar(30) DEFAULT NULL,
         AnoVeiculo int(4) DEFAULT NULL,
-        QtdKm bigint(6) DEFAULT NULL,
+        QtdKm varchar(100) DEFAULT NULL,
         TipCambio varchar(12) DEFAULT NULL,
         TipCombustivel varchar(20) DEFAULT NULL,
-        ValPreco bigint(15) DEFAULT NULL,
+        ValPreco varchar(100) DEFAULT NULL,
         dscAnuncio varchar(100) DEFAULT NULL
     )
 """)
@@ -37,8 +37,8 @@ conn.execute("""
 conn.execute("""
     CREATE TABLE IF NOT EXISTS tblfato (
         idTempo int(11) NOT NULL,
-        idLocal bigint(5) NOT NULL,
-        idVeiculo bigint(5) NOT NULL,
+        idLocal int(11) NOT NULL,
+        idVeiculo int(11) NOT NULL,
         valPreco int(11) DEFAULT NULL,
         FOREIGN KEY (idTempo) REFERENCES dimtempo(idTempo),
         FOREIGN KEY (idLocal) REFERENCES dimlocal(idLocal),
@@ -66,7 +66,7 @@ conn.close()
 
 
 def insert_data_into_temp_veiculo(data):
-    conn = sqlite3.connect("anuncios.db")
+    conn = sqlite3.connect("anunciosComEtl.db")
     cursor = conn.cursor()
 
     insert_query = """

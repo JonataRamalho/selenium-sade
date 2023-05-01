@@ -1,6 +1,8 @@
 import sqlite3
 import pandas as pd
 
+from createSqliteDatabase import insert_data_into_temp_veiculo
+
 conn = sqlite3.connect("anuncios.db")
 
 df = pd.read_sql_query('SELECT * FROM tbl_temp_veiculo', conn)
@@ -1267,11 +1269,20 @@ df['dscModelo'] = df['dscModelo'].str.replace(
     r'\bGNV\b', 'Não informado', regex=True)
 
 
-grouped = df.groupby('dscModelo')
-df['dscModelo'] = grouped['dscModelo'].transform(
+groupedMarca = df.groupby('dscMarca')
+df['dscMarca'] = groupedMarca['dscMarca'].transform(
     lambda x: x if len(x) > 3 else 'Não informado')
+
+groupedModelo = df.groupby('dscModelo')
+df['dscModelo'] = groupedModelo['dscModelo'].transform(
+    lambda x: x if len(x) > 3 else 'Não informado')
+
 grouped_novo = df.groupby('dscModelo')
 result = grouped_novo.size().to_frame('count')
 result.to_csv('output.csv', header=['count'])
 
+df = df.drop('codAnuncio', axis=1)
+ads = df.to_numpy()
+# print(ads)
 # print(df.head(30))
+insert_data_into_temp_veiculo(ads)

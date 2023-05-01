@@ -4,7 +4,7 @@ from unidecode import unidecode
 import re
 
 def insert_into_dimensions_and_fact_table():
-    conn = sqlite3.connect("anuncios.db")
+    conn = sqlite3.connect("anunciosComEtl.db")
     cursor = conn.cursor()
 
     # Busque todos os dados da tabela temporária
